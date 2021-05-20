@@ -1,0 +1,8 @@
+#form
+.gradle
+/build/
+.idea/
+gradle/
+gradlew
+gradlew.bat
+settings.gradle
