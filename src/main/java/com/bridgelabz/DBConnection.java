@@ -1,12 +1,12 @@
 package com.bridgelabz;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Enumeration;
 
 public class DBConnection {
+    private PreparedStatement employeePayrollDataStatement;
+    private static EmployeePayrollDBService employeePayrollDBService;
+
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
         String userName = "root";

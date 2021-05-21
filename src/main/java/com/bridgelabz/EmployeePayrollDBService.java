@@ -6,6 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayrollDBService {
+    private static EmployeePayrollDBService employeePayrollDBService;
+    private PreparedStatement employeePayrollDataStatement;
+
+    private EmployeePayrollDBService() {
+    }
+
+    public static EmployeePayrollDBService getInstance() {
+        if (employeePayrollDBService == null)
+            employeePayrollDBService = new EmployeePayrollDBService();
+        return employeePayrollDBService;
+    }
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
         String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
@@ -42,4 +53,57 @@ public class EmployeePayrollDBService {
     }
 
 
+    public int updateEmployeeData(String name, double salary) {
+        return this.updateEmployeeDataUsingStatement(name,salary);
+    }
+
+    private int updateEmployeeDataUsingStatement(String name, double salary) {
+        String sql = String.format("UPDATE employee_payroll SET salary = %.2f WHERE name= '%s';",salary,name);
+        try(Connection connection = this.getConnection()){
+            Statement statement = connection.createStatement();
+            return statement.executeUpdate(sql);
+        }catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<EmployeePayrollData> getEmployeePayrollData(String name) throws SQLException {
+        List<EmployeePayrollData> employeePayrollList;
+        if (this.employeePayrollDataStatement == null)
+            this.prepareStatementForEmployeeData();
+            employeePayrollDataStatement.setString(1, name);
+            ResultSet resultSet;
+            resultSet = employeePayrollDataStatement.executeQuery();
+            employeePayrollList = this.getEmployeePayrollData(resultSet);
+        return employeePayrollList;
+    }
+
+    private List<EmployeePayrollData> getEmployeePayrollData(ResultSet resultSet) throws SQLException {
+        List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+        while (resultSet.next()){
+            int id = resultSet.getInt("employee_id");
+            String name = resultSet.getString("name");
+            double salary = resultSet.getDouble("salary");
+            LocalDate startDate = resultSet.getDate("start").toLocalDate();
+            employeePayrollList.add(new EmployeePayrollData(id, name, salary, startDate));
+        }
+        return employeePayrollList;
+    }
+
+    private void prepareStatementForEmployeeData() {
+        Connection connection = null;
+        try {
+            connection = this.getConnection();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        String sql = "SELECT * FROM employee_payroll WHERE name = ?";
+        try {
+            assert connection != null;
+            employeePayrollDataStatement = connection.prepareStatement(sql);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }

@@ -1,21 +1,25 @@
 package com.bridgelabz;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class EmployeePayrollService {
+    public enum IOService {CONSOLE_IO, FILE_IO, DB_I0, REST_IO};
     public static List<EmployeePayrollData> employeePayrollList;
+    private EmployeePayrollDBService employeePayrollDBService;
 
     public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
+        this();
         this.employeePayrollList = employeePayrollList;
     }
 
-    public EmployeePayrollService() {}
 
-    public enum IOService {CONSOLE_IO, FILE_IO, DB_I0, REST_IO};
-
+    public EmployeePayrollService(){
+        employeePayrollDBService = EmployeePayrollDBService.getInstance();
+    }
 
     public static void main(String[] args) {
         employeePayrollList = new ArrayList<>();
@@ -50,8 +54,27 @@ public class EmployeePayrollService {
         else if(ioService.equals(IOService.FILE_IO))
             new EmployeePayrollFileIOService().readData(employeePayrollList);
         else if (ioService.equals(IOService.DB_I0))
-            employeePayrollList = new EmployeePayrollDBService().readData();
+            employeePayrollList = employeePayrollDBService.readData();
         return employeePayrollList;
+    }
+
+    public boolean checkEmployeePayrollInSyncWithDB(String name) throws SQLException {
+        List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeePayrollData(name);
+        return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
+    }
+
+    public void updateEmployeeSalary(String name, double salary) {
+        int result = employeePayrollDBService.updateEmployeeData(name,salary);
+        if (result == 0) return;
+        EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+        if(employeePayrollData != null) employeePayrollData.salary = salary;
+    }
+
+    private EmployeePayrollData getEmployeePayrollData(String name) {
+        return employeePayrollList.stream()
+                .filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
 
