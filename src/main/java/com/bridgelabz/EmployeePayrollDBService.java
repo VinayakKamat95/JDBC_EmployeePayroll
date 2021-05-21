@@ -54,7 +54,8 @@ public class EmployeePayrollDBService {
 
 
     public int updateEmployeeData(String name, double salary) {
-        return this.updateEmployeeDataUsingStatement(name,salary);
+        //return this.updateEmployeeDataUsingStatement(name,salary);
+        return this.updateEmployeeDataUsingPreparedStatement(name,salary);
     }
 
     private int updateEmployeeDataUsingStatement(String name, double salary) {
@@ -63,6 +64,20 @@ public class EmployeePayrollDBService {
             Statement statement = connection.createStatement();
             return statement.executeUpdate(sql);
         }catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int updateEmployeeDataUsingPreparedStatement(String name, double salary) {
+        try(Connection connection = this.getConnection()){
+            String sql = "UPDATE employee_payroll SET salary = ? WHERE name= ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDouble(1,salary);
+            preparedStatement.setString(2,name);
+            //int result= preparedStatement.executeUpdate();
+            return  preparedStatement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return 0;
