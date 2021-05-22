@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class EmployeePayrollService {
+
     public enum IOService {CONSOLE_IO, FILE_IO, DB_I0, REST_IO};
     public static List<EmployeePayrollData> employeePayrollList;
     private EmployeePayrollDBService employeePayrollDBService;
@@ -15,7 +16,6 @@ public class EmployeePayrollService {
         this();
         this.employeePayrollList = employeePayrollList;
     }
-
 
     public EmployeePayrollService(){
         employeePayrollDBService = EmployeePayrollDBService.getInstance();
@@ -63,6 +63,11 @@ public class EmployeePayrollService {
         return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
     }
 
+    public List<EmployeePayrollData> retrieveEmployeesForgivenDateRange(String startDate, String endDate) throws SQLException {
+        List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.retrieveEmployeePayrollDateRange(startDate, endDate);
+        return employeePayrollDataList;
+    }
+
     public void updateEmployeeSalary(String name, double salary) {
         int result = employeePayrollDBService.updateEmployeeData(name,salary);
         if (result == 0) return;
@@ -70,13 +75,13 @@ public class EmployeePayrollService {
         if(employeePayrollData != null) employeePayrollData.salary = salary;
     }
 
+
     private EmployeePayrollData getEmployeePayrollData(String name) {
         return employeePayrollList.stream()
                 .filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
                 .findFirst()
                 .orElse(null);
     }
-
 
     public void printData(IOService ioService) {
         if(ioService.equals(IOService.CONSOLE_IO))
