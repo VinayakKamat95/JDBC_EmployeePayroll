@@ -90,6 +90,9 @@ public class EmployeePayrollService {
             return null;
     }
 
+    public void addEmployeeToPayroll(String name, String gender, double salary, LocalDate start) throws ClassNotFoundException {
+        employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name, gender, salary, start));
+    }
 
     public void printData(IOService ioService) {
         if(ioService.equals(IOService.CONSOLE_IO))
