@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.bridgelabz.EmployeePayrollService.IOService.DB_I0;
 import static com.bridgelabz.EmployeePayrollService.IOService.FILE_IO;
@@ -48,5 +49,15 @@ public class EmployeePayrollServiceTest {
         List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(DB_I0);
         List<EmployeePayrollData> employeesForgivenDateRange = employeePayrollService.retrieveEmployeesForgivenDateRange("2018-01-01", "2019-12-01");
         Assert.assertEquals(2,employeesForgivenDateRange.size());
+    }
+
+    @Test
+    public void givenPayrollData_WhenAverageSalaryRetrievedByGender_ShouldReturnProperValue() throws ClassNotFoundException {
+        EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+        List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(DB_I0);
+        Map<String,Double> averageSalaryByGender  = employeePayrollService.readAverageSalaryByGender(DB_I0);
+        System.out.println(averageSalaryByGender);
+        Assert.assertTrue(averageSalaryByGender.get("M").equals(2000000.00)&&
+                averageSalaryByGender.get("F").equals(4000000.00));
     }
 }

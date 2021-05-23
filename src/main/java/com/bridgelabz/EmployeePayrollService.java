@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class EmployeePayrollService {
@@ -75,13 +76,20 @@ public class EmployeePayrollService {
         if(employeePayrollData != null) employeePayrollData.salary = salary;
     }
 
-
     private EmployeePayrollData getEmployeePayrollData(String name) {
         return employeePayrollList.stream()
                 .filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
                 .findFirst()
                 .orElse(null);
     }
+
+    public Map<String, Double> readAverageSalaryByGender(IOService ioService) throws ClassNotFoundException {
+            if(ioService.equals(IOService.DB_I0)) {
+                    return employeePayrollDBService.getAverageSalaryByGender();
+            }
+            return null;
+    }
+
 
     public void printData(IOService ioService) {
         if(ioService.equals(IOService.CONSOLE_IO))
